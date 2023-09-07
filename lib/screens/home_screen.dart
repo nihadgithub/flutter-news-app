@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:news_app/services/api_services.dart';
 import 'package:news_app/model/model.dart';
+import 'package:news_app/screens/news_screen.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
@@ -39,8 +40,14 @@ class HomeScreen extends StatelessWidget {
                 itemCount: snapshot.data?.length,
                 itemBuilder: (context,index){
                   Article article = snapshot.data![index];
-                  return GestureDetector(
-                      onTap: (){} ,
+                  return InkWell(
+                      splashColor: Colors.red,
+                      focusColor: Colors.blueGrey,
+                      /*overlayColor: Colors.green,*/
+
+                    onTap: (){
+                        Navigator.push(context, MaterialPageRoute(builder: (context)=> NewsScreen(article: article,)));
+                      } ,
                       child: Container(
                         height: 250,
                         width: double.maxFinite,
