@@ -1,24 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:news_app/services/api_services.dart';
+import 'package:news_app/model/model.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
-
+  HomeScreen({super.key});
+  ApiService client = ApiService();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: IconButton(
-            onPressed: (){},
-            icon: Icon(Icons.menu)),
+        leading: IconButton(onPressed: () {}, icon: Icon(Icons.menu)),
         title: Text("HESPRESS"),
         centerTitle: true,
         actions: [
-          IconButton(onPressed: (){}, icon: Icon(Icons.login)),
+          IconButton(onPressed: () {}, icon: Icon(Icons.login)),
         ],
-
       ),
-
-      bottomNavigationBar: BottomNavigationBar(items: [
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Top Stories',
@@ -32,33 +31,68 @@ class HomeScreen extends StatelessWidget {
         unselectedItemColor: Colors.blueGrey[300],
         selectedItemColor: Colors.blueGrey[50],
       ),
-      
-      body: ListView.builder(
-          itemCount: 5,
-          itemBuilder: (context,index){
-            return Container(
-              height: 200,
-              decoration: BoxDecoration(
-                image: DecorationImage(image: AssetImage("assets/images/news.jpg"),fit: BoxFit.cover),
-                color: Colors.red,
-                boxShadow: [
-                  /*BoxShadow(
-                    color: Colors.black,
-                    spreadRadius: -10.0,
-                    blurRadius: 100.0,
-                  ),*/
-                ],
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Text("Heading or Title of the Breaking News",style: TextStyle(shadows: [BoxShadow()],color: Colors.white,fontSize: 30),)
-                ],
-              ),
-            );
-      }),
-      
+      body: FutureBuilder<List<Article>>(
+        future: client.getArticle(),
+        builder: (BuildContext context,AsyncSnapshot<List<Article>> snapshot){
+          if (snapshot.hasData){
+            return ListView.builder(
+                itemCount: snapshot.data?.length,
+                itemBuilder: (context,index){
+                  Article article = snapshot.data![index];
+                  return GestureDetector(
+                      onTap: (){} ,
+                      child: Container(
+                        height: 250,
+                        width: double.maxFinite,
+                        child: Stack(
+
+                          children: [
+                            Image(image: NetworkImage(article.urlToImage==null?"https://upload.wikimedia.org/wikipedia/commons/thumb/6/65/No-Image-Placeholder.svg/624px-No-Image-Placeholder.svg.png":article.urlToImage.toString()),fit: BoxFit.cover,height: 250,width: double.maxFinite,),
+                            Container(
+                              /*height: 250,*/
+                              padding: const EdgeInsets.all(25.0),
+                              alignment: Alignment.bottomCenter,
+                              decoration: BoxDecoration(
+                                /*border: Border(bottom: BorderSide(width: 8)),*/
+
+                                gradient: LinearGradient(
+
+                                  begin: Alignment.topCenter,
+                                  end: Alignment.bottomCenter,
+                                  colors: <Color>[
+                                    Colors.black.withAlpha(0),
+                                    Colors.black12,
+                                    Colors.black45
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            Positioned(
+                              bottom: 20,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  //ElevatedButton(onPressed: (){}, child: Text("CAT",style: TextStyle(color: Colors.black,fontSize: 14,fontWeight: FontWeight.w600),),),
+                                  SizedBox(
+                                      width: 300,
+                                      child: Text(article.title!,style: TextStyle(color: Colors.white,fontSize: 22,fontWeight: FontWeight.w600),))
+                                ],
+                              ),
+                            ),
+
+                          ],
+                        ),
+                      ),
+                  );
+                }
+                );
+          }
+          else{
+            return CircularProgressIndicator();
+          }
+        },
+      ),
     );
   }
 }
